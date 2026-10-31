@@ -28,6 +28,8 @@ final class SettingsTest extends IntegrationTestCase
 
     public function test_sanitizes_the_option_on_update(): void
     {
+        Settings::register_setting();
+
         update_option(Settings::OPTION, '<b>Hi</b>');
 
         $this->assertSame('Hi', get_option(Settings::OPTION));
@@ -83,6 +85,54 @@ final class SettingsTest extends IntegrationTestCase
         Plugin::deactivate();
 
         $this->assertSame(UAMS_PLUGIN_TEMPLATE_VERSION, get_option('uams_plugin_template_version'));
+    }
+
+    public function test_uninstall_removes_the_options_from_every_site(): void
+    {
+        $siteIds = [get_current_blog_id()];
+
+        if (is_multisite()) {
+            $created = self::factory()->blog->create();
+            $this->assertIsInt($created);
+            $siteIds[] = $created;
+        }
+
+        foreach ($siteIds as $siteId) {
+            $this->onSite($siteId, static function (): void {
+                update_option(Settings::OPTION, 'kept until uninstall');
+                update_option('uams_plugin_template_version', '0.1.0');
+            });
+        }
+
+        define('WP_UNINSTALL_PLUGIN', 'uams-plugin-template/uams-plugin-template.php');
+        require dirname(__DIR__, 2).'/uninstall.php';
+
+        foreach ($siteIds as $siteId) {
+            $this->onSite($siteId, function (): void {
+                $this->assertFalse(get_option(Settings::OPTION));
+                $this->assertFalse(get_option('uams_plugin_template_version'));
+            });
+        }
+    }
+
+    /**
+     * Run a callback on a site: switch_to_blog() exists only on a multisite.
+     */
+    private function onSite(int $siteId, callable $callback): void
+    {
+        if (! is_multisite()) {
+            $callback();
+
+            return;
+        }
+
+        switch_to_blog($siteId);
+
+        try {
+            $callback();
+        } finally {
+            restore_current_blog();
+        }
     }
 
     /**
