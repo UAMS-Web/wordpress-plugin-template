@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      composer:
+        patterns: ['*']
+
+  - package-ecosystem: composer
+    directory: /tests/Integration
+    schedule:
+      interval: weekly
+    groups:
+      composer-integration:
+        patterns: ['*']
+
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/setup
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

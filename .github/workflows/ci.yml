@@ -1,0 +1,173 @@
+name: CI
+
+# The checks every plugin made from this template starts with. Public plugins run them
+# in Actions; a private plugin runs the shared local CI runner instead (see the README).
+#
+# The last job, `CI`, is the one check a ruleset requires. It needs every other job,
+# runs `if: always()`, and fails unless every needed job reports `success`. Adding a
+# job means adding it to the `needs:` list of `CI`.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  composer-validate:
+    name: Composer validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - run: composer validate --no-check-publish --no-check-all
+
+  floor-lint:
+    name: Floor lint (PHP 8.2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+      # Parses every shipped PHP file under the supported floor.
+      - run: php scripts/lint-floor.php
+
+  download-archive:
+    name: Download archive
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - run: node scripts/check-download-archive.mjs
+
+  pint:
+    name: Pint
+    needs: [composer-validate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: composer test:pint
+
+  phpcs:
+    name: phpcs (WordPress security sniffs)
+    needs: [composer-validate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: composer test:phpcs
+
+  rector:
+    name: Rector
+    needs: [pint]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: composer test:refactor
+
+  phpstan:
+    name: PHPStan
+    needs: [pint]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+        with:
+          integration: 'true'
+      - run: composer stan
+
+  unit:
+    name: Unit (Pest)
+    needs: [rector, phpstan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: composer test:unit
+
+  integration:
+    name: Integration (${{ matrix.mode }})
+    needs: [rector, phpstan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [single, multisite]
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: uams_plugin_template_tests
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      WP_TESTS_ABSPATH: ${{ runner.temp }}/wordpress
+      WP_TESTS_DB_HOST: 127.0.0.1
+      WP_MULTISITE: ${{ matrix.mode == 'multisite' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+        with:
+          integration: 'true'
+      # The WordPress core copy the suite boots; the version is the one the sites run
+      # (docs/DECISIONS.md), matching wp-phpunit in tests/Integration/composer.json.
+      - name: Download WordPress
+        env:
+          WP_VERSION: '7.0.8'
+        run: |
+          mkdir -p "$WP_TESTS_ABSPATH"
+          curl -fsSL "https://wordpress.org/wordpress-${WP_VERSION}.tar.gz" | tar -xz -C "$WP_TESTS_ABSPATH" --strip-components=1
+      - run: composer test:integration
+
+  # The one check a ruleset requires from this workflow.
+  ci:
+    name: CI
+    needs: [composer-validate, floor-lint, download-archive, pint, phpcs, rector, phpstan, unit, integration]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # `skipped` and `cancelled` fail as well as `failure`: a job that did not run proved nothing.
+      - name: Every needed job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Needed job results: $RESULTS"
+          for result in $RESULTS; do
+            if [ "$result" != "success" ]; then
+              echo "::error::A needed job reported $result"
+              exit 1
+            fi
+          done
