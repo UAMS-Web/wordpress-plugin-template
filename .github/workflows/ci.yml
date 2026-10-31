@@ -133,7 +133,7 @@ jobs:
           --health-timeout=5s
           --health-retries=10
     env:
-      WP_TESTS_ABSPATH: ${{ runner.temp }}/wordpress
+      WP_TESTS_ABSPATH: /tmp/wordpress
       WP_TESTS_DB_HOST: 127.0.0.1
       WP_MULTISITE: ${{ matrix.mode == 'multisite' && '1' || '0' }}
     steps:
