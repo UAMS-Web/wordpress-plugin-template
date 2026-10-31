@@ -64,7 +64,7 @@ final class Settings
      */
     public static function sanitize(mixed $value): string
     {
-        return is_string($value) ? sanitize_text_field(wp_unslash($value)) : '';
+        return is_string($value) ? sanitize_text_field($value) : '';
     }
 
     /**
@@ -106,7 +106,7 @@ final class Settings
         check_admin_referer(self::ACTION, self::NONCE);
 
         // The nonce was verified by check_admin_referer() above.
-        $submitted = isset($_POST['greeting']) ? self::sanitize($_POST['greeting']) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $submitted = isset($_POST['greeting']) ? sanitize_text_field(wp_unslash($_POST['greeting'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
         update_option(self::OPTION, $submitted);
 

@@ -32,6 +32,7 @@
  */
 
 declare(strict_types=1);
+use UAMS\PluginTemplate\Plugin;
 
 defined('ABSPATH') || exit;
 
@@ -55,7 +56,7 @@ define('UAMS_PLUGIN_TEMPLATE_FILE', __FILE__);
 
 require_once __DIR__.'/includes/autoload.php';
 
-register_activation_hook(__FILE__, [UAMS\PluginTemplate\Plugin::class, 'activate']);
-register_deactivation_hook(__FILE__, [UAMS\PluginTemplate\Plugin::class, 'deactivate']);
+register_activation_hook(__FILE__, [Plugin::class, 'activate']);
+register_deactivation_hook(__FILE__, [Plugin::class, 'deactivate']);
 
-UAMS\PluginTemplate\Plugin::boot();
+Plugin::boot();

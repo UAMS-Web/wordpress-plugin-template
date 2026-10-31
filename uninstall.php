@@ -21,8 +21,8 @@ function uams_plugin_template_remove_site_data(): void
 }
 
 if (is_multisite()) {
-    foreach (get_sites(['fields' => 'ids', 'number' => 0]) as $uams_plugin_template_site_id) {
-        switch_to_blog((int) $uams_plugin_template_site_id);
+    foreach (get_sites(['number' => 0]) as $uams_plugin_template_site) {
+        switch_to_blog((int) $uams_plugin_template_site->blog_id);
         uams_plugin_template_remove_site_data();
         restore_current_blog();
     }

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\If_\UnwrapFutureCompatibleIfPhpVersionRector;
+use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
 use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
@@ -15,6 +17,13 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         __DIR__.'/tests/Integration/vendor',
+        // The floor guard in the main file is deliberate: it protects a site
+        // downgraded underneath an active plugin.
+        UnwrapFutureCompatibleIfPhpVersionRector::class => [__DIR__.'/uams-plugin-template.php'],
+        // WordPress hooks take `[Class::class, 'method']` callables: remove_action()
+        // finds a hook by the callable it was added with, and a first-class
+        // callable is a new Closure on every call, so it could never be removed.
+        ArrayToFirstClassCallableRector::class,
     ])
     ->withPreparedSets(
         deadCode: true,

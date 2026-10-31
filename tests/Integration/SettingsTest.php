@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace UAMS\PluginTemplate\Tests\Integration;
 
+use UAMS\PluginTemplate\Plugin;
 use UAMS\PluginTemplate\Settings;
 use UAMS\PluginTemplate\Tests\Support\IntegrationTestCase;
 use WPDieException;
@@ -34,7 +35,7 @@ final class SettingsTest extends IntegrationTestCase
 
     public function test_the_page_escapes_the_stored_greeting(): void
     {
-        wp_set_current_user(self::factory()->user->create(['role' => 'administrator']));
+        $this->actingAs('administrator');
         update_option(Settings::OPTION, 'a"b');
 
         ob_start();
@@ -47,8 +48,8 @@ final class SettingsTest extends IntegrationTestCase
 
     public function test_a_subscriber_cannot_view_the_page(): void
     {
-        wp_set_current_user(self::factory()->user->create(['role' => 'subscriber']));
-        add_filter('wp_die_handler', static fn (): callable => static function (): void {
+        $this->actingAs('subscriber');
+        add_filter('wp_die_handler', static fn (): callable => static function (): never {
             throw new WPDieException('denied');
         });
 
@@ -59,8 +60,8 @@ final class SettingsTest extends IntegrationTestCase
 
     public function test_a_save_without_a_valid_nonce_is_refused(): void
     {
-        wp_set_current_user(self::factory()->user->create(['role' => 'administrator']));
-        add_filter('wp_die_handler', static fn (): callable => static function (): void {
+        $this->actingAs('administrator');
+        add_filter('wp_die_handler', static fn (): callable => static function (): never {
             throw new WPDieException('bad nonce');
         });
         $_POST['greeting'] = 'x';
@@ -78,9 +79,23 @@ final class SettingsTest extends IntegrationTestCase
     {
         delete_option('uams_plugin_template_version');
 
-        \UAMS\PluginTemplate\Plugin::activate();
-        \UAMS\PluginTemplate\Plugin::deactivate();
+        Plugin::activate();
+        Plugin::deactivate();
 
         $this->assertSame(UAMS_PLUGIN_TEMPLATE_VERSION, get_option('uams_plugin_template_version'));
+    }
+
+    /**
+     * Make a new user with the role the current user.
+     */
+    private function actingAs(string $role): void
+    {
+        $id = self::factory()->user->create(['role' => $role]);
+
+        if (! is_int($id)) {
+            $this->fail('Could not create a '.$role.' user.');
+        }
+
+        wp_set_current_user($id);
     }
 }

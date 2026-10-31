@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace UAMSPluginTemplate\Tests\Support;
+namespace UAMS\PluginTemplate\Tests\Support;
 
 use WP_UnitTest_Factory;
 use WP_UnitTestCase;
