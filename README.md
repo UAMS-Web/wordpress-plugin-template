@@ -24,9 +24,17 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
    | Find | Replace with | Notes |
    | --- | --- | --- |
    | `uams-plugin-template` | the plugin slug | File name `uams-plugin-template.php`, the text domain, the `.pot` file name, `composer.json` package name, `scripts/build-zip.mjs`, `.gitattributes`, `phpcs.xml.dist`, `phpstan.neon.dist`, `rector.php`, `phpunit.xml`, `tests/` |
-   | `UAMS\PluginTemplate` and `UAMS\\PluginTemplate` | the plugin's namespace | `includes/`, `tests/`, `composer.json`, `phpcs.xml.dist` |
+   | `UAMS\PluginTemplate` and `UAMS\\PluginTemplate` | the plugin's namespace (see below) | `includes/`, `includes/autoload.php`, `tests/`, `composer.json`, `phpcs.xml.dist` |
    | `uams_plugin_template` and `UAMS_PLUGIN_TEMPLATE` | the plugin's prefix | Options, hooks, constants, the test database name |
    | `UAMS Plugin Template` | the plugin's name | Header, `readme.txt`, `.pot`, page titles |
+
+   **The namespace.** Make it `UAMSWeb\Aether\<Product>` or `UAMSWeb\Aether\<Family>\<Product>` for a plugin in the Aether ecosystem, and `UAMSWeb\<Product>` for one outside it; the family level is optional. The prefix can be any depth, because [PSR-4](https://www.php-fig.org/psr/psr-4/) allows it, so the files under `includes/` do not move when the prefix changes. Three rules keep two packages from colliding:
+
+   - A prefix has one owner or none. Two packages never map the same one, and no package maps a bare family prefix: `UAMSWeb\Aether\Forms\Settings\` and `UAMSWeb\Aether\Forms\Multisite\` are two packages' prefixes, and nobody maps `UAMSWeb\Aether\Forms\`.
+   - A package may own a prefix with a companion nested inside it, but then the outer package has no directory under `includes/` named after the inner one. Composer picks the longest matching prefix, so an inner `UAMSWeb\People\Listings\` package is reached only if the outer `UAMSWeb\People\` package has no `includes/Listings/`.
+   - The template's own `UAMS\PluginTemplate` is a placeholder and matches none of the shapes above, so every plugin renames it.
+
+   The plugin loads its classes with its own small autoloader (`includes/autoload.php`), not Composer's, because a branch deploy has no `vendor/`. That changes two things. The prefix is a string in `includes/autoload.php` as well as in `composer.json`, which maps only `autoload-dev` (the tests), so change both and keep them in step. And the autoloader maps one prefix to `includes/` and does no longest-prefix matching, so the no-directory-under-`includes/` rule is the only thing that keeps an outer plugin from claiming an inner plugin's classes.
 
 3. Update the header's `Plugin URI` and `Description`, `readme.txt`, and this README. Delete the example `Settings` screen once the plugin has its own, keeping the pattern.
 4. Run `composer install` and `composer setup:integration`, then `composer test`, so the first commit is green.
