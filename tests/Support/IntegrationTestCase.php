@@ -20,7 +20,7 @@ use WP_UnitTestCase;
  * The Integration suite runs from its own Composer setup on PHPUnit 9.6, so it
  * needs no adapter: core's expectDeprecated() and checkRequirements() work as
  * shipped. A suite moved onto PHPUnit 10 or later would need one, and that move
- * waits on WordPress supporting it (UAMS-Web/uams-claude-skills#124).
+ * waits on WordPress core's test suite supporting it.
  */
 abstract class IntegrationTestCase extends WP_UnitTestCase
 {

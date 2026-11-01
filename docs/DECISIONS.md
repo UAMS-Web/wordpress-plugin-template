@@ -24,7 +24,7 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 
 ## 2026-10-30 First version of the template (#1)
 
-**Decision.** A plugin made from the template is public by default, with checks in GitHub Actions; the README documents the switch to the shared local CI runner for a private plugin. Sites deploy a branch through WP Pusher, so runtime libraries are committed and nothing is built at deploy time; a script builds the upload ZIP and a workflow attaches it to a GitHub release, with no `dist/` directory committed. This repository's build seat builds it.
+**Decision.** A plugin made from the template is public by default, with checks in GitHub Actions; the README documents the switch to the shared local CI runner for a private plugin. Sites deploy a branch through WP Pusher, so runtime libraries are committed and nothing is built at deploy time; a script builds the upload ZIP and a workflow attaches it to a GitHub release, with no `dist/` directory committed. The release workflow, `release.yml`, builds it.
 
 **Why.** Most new plugins are expected to be public, where Actions minutes are free. A branch install needs no build step, and a release ZIP serves a manual upload.
 
@@ -39,11 +39,11 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 - **Names.** Slug and text domain `uams-plugin-template`, namespace `UAMSWeb\PluginTemplate`, prefix `uams_plugin_template` (constants `UAMS_PLUGIN_TEMPLATE_`). The README lists every place to rename.
 - **WordPress pin.** The integration suite pins `wp-phpunit` `~7.0.0` and CI downloads WordPress 7.0.8: two UAMS sites (`uamshealth.com`, `medicine.uams.edu`) served core asset version `7.0.8` on 2026-10-31. `uams.edu` hides its version and was not measured. The header's `Requires at least` stays 6.9, the oldest the example code works on.
 - **No Composer autoloader at runtime.** The plugin loads its classes with a small PSR-4 autoloader in `includes/autoload.php`, so the deployed branch needs no `vendor/` directory. Composer holds development tools only.
-- **The archive check is a copy.** This repository is not a sync target, so `scripts/check-download-archive.mjs` is a verbatim copy of the shared check (`UAMS-Web/uams-claude-skills#137`). A plugin that onboards to the sync takes the synced copy and may delete this one.
-- **No shared sync files.** The template carries no `.claude/`, `.agents/` or `.cursor/` files: the sync delivers them when a plugin is onboarded (`UAMS-Web/uams-claude-skills#181`).
+- **The archive check is a copy.** This repository is not a sync target, so `scripts/check-download-archive.mjs` is a verbatim copy of the shared download-archive check. A plugin that onboards to the sync takes the synced copy and may delete this one.
+- **No shared sync files.** The template carries no `.claude/`, `.agents/` or `.cursor/` files: the sync delivers them when a plugin is onboarded.
 - **Multisite.** The integration suite runs in Actions both as a single site and as a multisite (`WP_MULTISITE=1`).
 
-**Why.** Each follows from the ticket's decision and the shared WordPress standard (`UAMS-Web/uams-claude-skills#125`, `#126`).
+**Why.** Each follows from the ticket's decision and the shared WordPress standard.
 
 **Rejected.** Pinning WordPress 7.1, the latest, because the measured sites run 7.0.8. Committing Composer's `vendor/` for the autoloader, which would put development tooling beside runtime code.
 

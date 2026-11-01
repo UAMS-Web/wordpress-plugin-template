@@ -38,7 +38,7 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
 
 3. Update the header's `Plugin URI` and `Description`, `readme.txt`, and this README. Delete the example `Settings` screen once the plugin has its own, keeping the pattern.
 4. Run `composer install` and `composer setup:integration`, then `composer test`, so the first commit is green.
-5. Onboard the plugin to the shared sync, which delivers the shared skills and rules (this template is not itself a sync target; see `UAMS-Web/uams-claude-skills#181`). The synced copy of the archive check can replace `scripts/check-download-archive.mjs`.
+5. Onboard the plugin to the shared sync, which delivers the shared skills and rules (this template is not itself a sync target). The synced copy of the archive check can replace `scripts/check-download-archive.mjs`.
 6. Set the repository's visibility and checks (below), and require the `CI` check in a ruleset.
 
 ## Develop
