@@ -15,6 +15,13 @@ updates:
     groups:
       composer-integration:
         patterns: ['*']
+    ignore:
+      # wp-phpunit tracks WordPress core, and tests/Integration/composer.json pins
+      # it to ~7.0.0 to match WordPress 7.0.8, the version the UAMS sites run
+      # (docs/DECISIONS.md, "WordPress pin"; the CI job's WP_VERSION must move with
+      # it). Lift this ignore, with that pin, when the sites move to 7.1.
+      - dependency-name: wp-phpunit/wp-phpunit
+        versions: ['>=7.1.0']
 
   - package-ecosystem: github-actions
     directories:
