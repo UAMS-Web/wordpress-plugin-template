@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace UAMS\PluginTemplate;
+namespace UAMSWeb\PluginTemplate;
 
 defined('ABSPATH') || exit;
 

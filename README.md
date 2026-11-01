@@ -7,7 +7,7 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
 | Path | Purpose |
 | --- | --- |
 | `uams-plugin-template.php` | The main file: full plugin header, direct-access guard, PHP floor guard, GPL notice. |
-| `includes/` | Namespaced code (`UAMS\PluginTemplate`) and a small autoloader, so a deployed branch needs no `vendor/`. `Settings` is a worked example of a capability check, a nonce, sanitized input and escaped output. |
+| `includes/` | Namespaced code (`UAMSWeb\PluginTemplate`) and a small autoloader, so a deployed branch needs no `vendor/`. `Settings` is a worked example of a capability check, a nonce, sanitized input and escaped output. |
 | `uninstall.php` | The one place data is removed. Multisite-aware. Activation and deactivation never delete data. |
 | `readme.txt` | WordPress.org-format readme. |
 | `languages/` | The `.pot` file. |
@@ -24,7 +24,7 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
    | Find | Replace with | Notes |
    | --- | --- | --- |
    | `uams-plugin-template` | the plugin slug | File name `uams-plugin-template.php`, the text domain, the `.pot` file name, `composer.json` package name, `scripts/build-zip.mjs`, `.gitattributes`, `phpcs.xml.dist`, `phpstan.neon.dist`, `rector.php`, `phpunit.xml`, `tests/` |
-   | `UAMS\PluginTemplate` and `UAMS\\PluginTemplate` | the plugin's namespace (see below) | `includes/`, `includes/autoload.php`, `tests/`, `composer.json`, `phpcs.xml.dist` |
+   | `UAMSWeb\PluginTemplate` and `UAMSWeb\\PluginTemplate` | the plugin's namespace (see below) | `includes/`, `includes/autoload.php`, `tests/`, `composer.json`, `phpcs.xml.dist` |
    | `uams_plugin_template` and `UAMS_PLUGIN_TEMPLATE` | the plugin's prefix | Options, hooks, constants, the test database name |
    | `UAMS Plugin Template` | the plugin's name | Header, `readme.txt`, `.pot`, page titles |
 
@@ -32,7 +32,7 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
 
    - A prefix has one owner or none. Two packages never map the same one, and no package maps a bare family prefix: `UAMSWeb\Aether\Forms\Settings\` and `UAMSWeb\Aether\Forms\Multisite\` are two packages' prefixes, and nobody maps `UAMSWeb\Aether\Forms\`.
    - A package may own a prefix with a companion nested inside it, but then the outer package has no directory under `includes/` named after the inner one. Composer picks the longest matching prefix, so an inner `UAMSWeb\People\Listings\` package is reached only if the outer `UAMSWeb\People\` package has no `includes/Listings/`.
-   - The template's own `UAMS\PluginTemplate` is a placeholder and matches none of the shapes above, so every plugin renames it.
+   - The template's own placeholder is `UAMSWeb\PluginTemplate`, the shape for a plugin outside the Aether ecosystem. A plugin in the Aether ecosystem renames it to `UAMSWeb\Aether\<Product>` instead.
 
    The plugin loads its classes with its own small autoloader (`includes/autoload.php`), not Composer's, because a branch deploy has no `vendor/`. That changes two things. The prefix is a string in `includes/autoload.php` as well as in `composer.json`, which maps only `autoload-dev` (the tests), so change both and keep them in step. And the autoloader maps one prefix to `includes/` and does no longest-prefix matching, so the no-directory-under-`includes/` rule is the only thing that keeps an outer plugin from claiming an inner plugin's classes.
 

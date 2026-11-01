@@ -1,7 +1,7 @@
 <?php
 
 /**
- * UAMS\PluginTemplate\Settings, with WordPress mocked.
+ * UAMSWeb\PluginTemplate\Settings, with WordPress mocked.
  *
  * @see includes/Settings.php
  */
@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 use Brain\Monkey\Functions;
-use UAMS\PluginTemplate\Settings;
+use UAMSWeb\PluginTemplate\Settings;
 
 use function Brain\Monkey\Functions\stubEscapeFunctions;
 use function Brain\Monkey\Functions\stubTranslationFunctions;

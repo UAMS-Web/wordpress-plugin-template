@@ -31,7 +31,7 @@
     <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
         <properties>
             <property name="prefixes" type="array">
-                <element value="UAMS\PluginTemplate"/>
+                <element value="UAMSWeb\PluginTemplate"/>
                 <element value="uams_plugin_template"/>
                 <element value="UAMS_PLUGIN_TEMPLATE"/>
             </property>

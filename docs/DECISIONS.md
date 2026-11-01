@@ -36,7 +36,7 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 
 **Decision.**
 
-- **Names.** Slug and text domain `uams-plugin-template`, namespace `UAMS\PluginTemplate`, prefix `uams_plugin_template` (constants `UAMS_PLUGIN_TEMPLATE_`). The README lists every place to rename.
+- **Names.** Slug and text domain `uams-plugin-template`, namespace `UAMSWeb\PluginTemplate`, prefix `uams_plugin_template` (constants `UAMS_PLUGIN_TEMPLATE_`). The README lists every place to rename.
 - **WordPress pin.** The integration suite pins `wp-phpunit` `~7.0.0` and CI downloads WordPress 7.0.8: two UAMS sites (`uamshealth.com`, `medicine.uams.edu`) served core asset version `7.0.8` on 2026-10-31. `uams.edu` hides its version and was not measured. The header's `Requires at least` stays 6.9, the oldest the example code works on.
 - **No Composer autoloader at runtime.** The plugin loads its classes with a small PSR-4 autoloader in `includes/autoload.php`, so the deployed branch needs no `vendor/` directory. Composer holds development tools only.
 - **The archive check is a copy.** This repository is not a sync target, so `scripts/check-download-archive.mjs` is a verbatim copy of the shared check (`UAMS-Web/uams-claude-skills#137`). A plugin that onboards to the sync takes the synced copy and may delete this one.

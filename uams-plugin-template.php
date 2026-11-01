@@ -32,7 +32,7 @@
  */
 
 declare(strict_types=1);
-use UAMS\PluginTemplate\Plugin;
+use UAMSWeb\PluginTemplate\Plugin;
 
 defined('ABSPATH') || exit;
 

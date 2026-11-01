@@ -13,7 +13,7 @@ declare(strict_types=1);
 defined('ABSPATH') || exit;
 
 spl_autoload_register(static function (string $class): void {
-    $prefix = 'UAMS\\PluginTemplate\\';
+    $prefix = 'UAMSWeb\\PluginTemplate\\';
 
     if (! str_starts_with($class, $prefix)) {
         return;

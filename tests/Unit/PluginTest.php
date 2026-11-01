@@ -1,7 +1,7 @@
 <?php
 
 /**
- * UAMS\PluginTemplate\Plugin, with WordPress mocked.
+ * UAMSWeb\PluginTemplate\Plugin, with WordPress mocked.
  *
  * @see includes/Plugin.php
  */
@@ -9,8 +9,8 @@
 declare(strict_types=1);
 
 use Brain\Monkey\Functions;
-use UAMS\PluginTemplate\Plugin;
-use UAMS\PluginTemplate\Settings;
+use UAMSWeb\PluginTemplate\Plugin;
+use UAMSWeb\PluginTemplate\Settings;
 
 use function Brain\Monkey\Actions\expectAdded;
 

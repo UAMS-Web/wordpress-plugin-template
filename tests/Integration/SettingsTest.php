@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace UAMS\PluginTemplate\Tests\Integration;
+namespace UAMSWeb\PluginTemplate\Tests\Integration;
 
-use UAMS\PluginTemplate\Plugin;
-use UAMS\PluginTemplate\Settings;
-use UAMS\PluginTemplate\Tests\Support\IntegrationTestCase;
+use UAMSWeb\PluginTemplate\Plugin;
+use UAMSWeb\PluginTemplate\Settings;
+use UAMSWeb\PluginTemplate\Tests\Support\IntegrationTestCase;
 use WPDieException;
 
 final class SettingsTest extends IntegrationTestCase

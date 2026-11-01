@@ -19,7 +19,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "UAMS\\PluginTemplate\\Tests\\": "tests/"
+            "UAMSWeb\\PluginTemplate\\Tests\\": "tests/"
         }
     },
     "config": {
