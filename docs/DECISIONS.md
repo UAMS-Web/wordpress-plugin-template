@@ -37,7 +37,7 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Decision.**
 
 - **Names.** Slug and text domain `uams-plugin-template`, namespace `UAMSWeb\PluginTemplate`, prefix `uams_plugin_template` (constants `UAMS_PLUGIN_TEMPLATE_`). The README lists every place to rename.
-- **WordPress pin.** The integration suite pins `wp-phpunit` `~7.0.0` and CI downloads WordPress 7.0.8: two UAMS sites (`uamshealth.com`, `medicine.uams.edu`) served core asset version `7.0.8` on 2026-10-31. `uams.edu` hides its version and was not measured. The header's `Requires at least` stays 6.9, the oldest the example code works on.
+- **WordPress pin.** The integration suite pins `wp-phpunit` `~7.0.0` and CI downloads WordPress 7.0.8: two UAMS sites (`uamshealth.com`, `medicine.uams.edu`) served core asset version `7.0.8` on 2026-10-31. `uams.edu` hides its version and was not measured. The header's `Requires at least` was 6.9 here; the 2026-11-02 entry below lowers it to 6.8.
 - **No Composer autoloader at runtime.** The plugin loads its classes with a small PSR-4 autoloader in `includes/autoload.php`, so the deployed branch needs no `vendor/` directory. Composer holds development tools only.
 - **The archive check is a copy.** This repository is not a sync target, so `scripts/check-download-archive.mjs` is a verbatim copy of the shared download-archive check. A plugin that onboards to the sync takes the synced copy and may delete this one.
 - **No shared sync files.** The template carries no `.claude/`, `.agents/` or `.cursor/` files: the sync delivers them when a plugin is onboarded.
@@ -63,3 +63,18 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Rejected.** Treating the directory guidelines as binding for every plugin.
 
 **Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/1
+
+## 2026-11-02 WordPress floor 6.8 and stubs pinned to it (#6)
+
+**Decision.**
+
+- **The floor is WordPress 6.8.** The plugin header's and `readme.txt`'s `Requires at least` say 6.8.
+- **The stubs match the floor.** `php-stubs/wordpress-stubs` is required as `~6.8.0`, so PHPStan checks the example code against the oldest supported WordPress and rejects a function 6.8 lacks. `.github/dependabot.yml` ignores stub updates of 6.9.0 and later, so they move only when the floor does.
+- **The integration suite is unchanged.** It stays on `wp-phpunit` `~7.0.0` and WordPress 7.0.8, the version most sites run.
+- **Site versions, read with `wp core version` on both hosting servers on 2026-11-02.** Most sites run WordPress 7.0.8 (`uamshealth.com`, `medicine.uams.edu` and 25 others), `web.uams.edu` runs 7.0.7, and `news.uams.edu` and `idhi.uams.edu` run 6.8.12.
+
+**Why.** A 6.9 floor did not promise to work on the two sites still on 6.8.12, and a stubs range reaching past the floor let static analysis accept functions those sites lack. The lock held 6.9.4, and Dependabot's #4 would have moved it to 7.1.2, ahead of every production site.
+
+**Rejected.** Leaving the floor at 6.9, which excludes two production sites. Following the latest stubs, which checks the code against a WordPress no site runs.
+
+**Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/6

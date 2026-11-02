@@ -7,6 +7,12 @@ updates:
     groups:
       composer:
         patterns: ['*']
+    ignore:
+      # The stubs are pinned to ~6.8.0, the plugin's WordPress floor, so PHPStan
+      # rejects any function the oldest supported site lacks (docs/DECISIONS.md,
+      # "WordPress floor"). Lift this ignore, with that pin, when the floor moves.
+      - dependency-name: php-stubs/wordpress-stubs
+        versions: ['>=6.9.0']
 
   - package-ecosystem: composer
     directory: /tests/Integration

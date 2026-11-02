@@ -1,7 +1,7 @@
 === UAMS Plugin Template ===
 Contributors: uams
 Tags: template
-Requires at least: 6.9
+Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
 Stable tag: 0.1.0

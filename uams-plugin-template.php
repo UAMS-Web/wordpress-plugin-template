@@ -5,7 +5,7 @@
  * Plugin URI:        https://github.com/UAMS-Web/wordpress-plugin-template
  * Description:       The starting point for a UAMS-Web WordPress plugin. Replace this description with the plugin's own.
  * Version:           0.1.0
- * Requires at least: 6.9
+ * Requires at least: 6.8
  * Requires PHP:      8.2
  * Author:            University of Arkansas for Medical Sciences
  * Author URI:        https://uams.edu/
