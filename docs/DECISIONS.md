@@ -78,3 +78,18 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Rejected.** Leaving the floor at 6.9, which excludes two production sites. Following the latest stubs, which checks the code against a WordPress no site runs.
 
 **Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/6
+
+## 2026-11-02 Required checks on the template come from atomic rulesets (#9)
+
+**Decision.** The template belongs to no ruleset family and takes the `required_checks` property with both values, `ci-aggregate` and `pr-body`, so its default branch requires three status check contexts:
+
+- **`CI`**, from organization ruleset `26449830` (`ci-aggregate`). It is the final job of `ci.yml`, which needs every other job, runs `if: always()` and fails unless each needed job succeeded.
+- **`Attribution footer` and `Closing keywords`**, from organization ruleset `26449671` (`pr-body`).
+
+`Aggregate needs` fails a pull request that leaves a job out of the `CI` needs list, so a job added or renamed later needs no ruleset edit. The per-job required-checks guard (`check-required-checks.mjs --strict`) is not delivered to the template and is retired for every repository that takes `ci-aggregate`.
+
+**Why.** Naming each job in a ruleset makes a renamed job block every merge until the ruleset is edited, and a skipped job counts as passing. One aggregate context moves that check into `ci.yml`, where the change that adds a job also updates the list. The guard compared reported job names with the ruleset, which is the wrong comparison once only three names are required: it reports every job as unrequired. A required context that nothing reports blocks the next pull request loudly, and `Aggregate needs` covers a job left out of `CI`, so the guard checks nothing the aggregate does not.
+
+**Rejected.** A `plugin` ruleset family. Naming each job in a ruleset. A ruleset on this repository alone. Keeping the per-job guard beside the aggregate.
+
+**Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/9
