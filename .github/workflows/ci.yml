@@ -3,19 +3,28 @@ name: CI
 # The checks every plugin made from this template starts with. Public plugins run them
 # in Actions; a private plugin runs the shared local CI runner instead (see the README).
 #
-# The last job, `CI`, is the one check a ruleset requires from this workflow (with the two
-# pull-request-body checks, `Attribution footer` and `Closing keywords`). It `needs:` every
-# other job in this file, runs `if: always()`, and fails unless every needed job reports
-# `success`: a `skipped` or `cancelled` job fails it. Adding a job means adding it to the
-# `needs:` list of `CI`; the `aggregate-needs` job fails the pull request when one is missing.
-# Do not rename `CI`.
+# The lint and unit chain is the shared one, `UAMS-Web/uams-ci-workflows`, called by the
+# `checks` job. One definition serves every UAMS-Web repository, so a plugin made from this
+# template does not carry a copy that drifts. The call switches on the three jobs only a
+# plugin runs (`floor-lint`, `download-archive`, `phpcs`), runs on Linux only, leaves
+# mutation testing off, and runs the plugin's unit suite as `composer test:unit`. The
+# chain's own header lists every input and its default.
 #
-# Shared with the other UAMS-Web repositories (the code-quality skill's ci.yml template):
-# `synced-files`, `no-emoji`, `aggregate-needs`, the lint and test chain, and `CI`. The
-# plugin's own jobs are `floor-lint`, `download-archive` and `integration`. The template's
-# `mutate`, `mutate-ignore` and `pest` jobs are left out: this repository has no
-# `mutate` Composer script, no pest-testing skill and no skip baseline, and its Pest suite
-# runs in the `unit` job.
+# `integration` stays here as a plain job beside the call, because its MySQL service and
+# WordPress download are not in the chain (UAMS-Web/uams-claude-skills#607).
+#
+# The last job, `CI`, is the one check a ruleset requires from this workflow (with the two
+# pull-request-body checks, `Attribution footer` and `Closing keywords`). It `needs:` the
+# call and `integration`, runs `if: always()`, and fails unless every needed job reports
+# `success`: a `skipped` or `cancelled` job fails it. The call ends in a `Chain result` job
+# that needs every job in the chain, so `checks` is `success` only when each of them
+# succeeded. Adding a plain job here means adding it to the `needs:` list of `CI`; the
+# `aggregate-needs` job in the chain fails the pull request when one is missing.
+# Do not rename `CI`, and do not rename `checks` without changing `needs:` below.
+#
+# What the plugin carries for the call, because the called jobs check out this repository:
+# `.github/actions/setup/action.yml`, the synced `.claude/skills` scripts, and the Composer
+# scripts `test:pint`, `test:refactor`, `stan`, `test:unit` and `test:phpcs`.
 
 on:
   pull_request:
@@ -23,149 +32,33 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# A new push to a pull request cancels that pull request's stale run. Every other run gets a
+# group of its own, keyed on the commit, so a later push never cancels it.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
-  composer-validate:
-    name: Composer validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          coverage: none
-          tools: composer:v2
-      - run: composer validate --no-check-publish --no-check-all
-
-  floor-lint:
-    name: Floor lint (PHP 8.2)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          coverage: none
-      # Parses every shipped PHP file under the supported floor.
-      - run: php scripts/lint-floor.php
-
-  download-archive:
-    name: Download archive
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-      - run: node scripts/check-download-archive.mjs
-
-  synced-files:
-    name: Synced files (no hand-edited rules or skills)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-
-      # Fails, naming the file, when a synced rule or skill was edited by hand.
-      - run: node .claude/skills/synced-files/scripts/check-synced-files.mjs
-
-  no-emoji:
-    name: No emoji in durable records
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-
-      # Fails, naming the file, line and code point, when prose carries a banned glyph.
-      - run: node .claude/skills/writing-comments/scripts/check-no-emoji.mjs
-
-  aggregate-needs:
-    name: Aggregate needs
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-
-      # Fails, naming the job, when a job is missing from the `needs:` list of `CI` or a
-      # fixed required name is reported by no job. Allow-list: .github/aggregate-needs-allow.json.
-      - run: node .claude/skills/code-quality/scripts/check-aggregate-needs.mjs
-
-  pint:
-    name: Pint
-    needs: [composer-validate, synced-files]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - run: composer test:pint
-
-  phpcs:
-    name: phpcs (WordPress security sniffs)
-    needs: [composer-validate]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - run: composer test:phpcs
-
-  rector:
-    name: Rector
-    needs: [pint]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - run: composer test:refactor
-
-  phpstan:
-    name: PHPStan
-    needs: [pint]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-        with:
-          integration: 'true'
-      - run: composer stan
-
-  unit:
-    name: Unit (Pest)
-    needs: [rector, phpstan]
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup
-      - run: composer test:unit
+  # The shared chain. Its checks report as `checks / <job name> (<operating system>)`.
+  checks:
+    # Pinned to the commit that published the plugin inputs (UAMS-Web/uams-ci-workflows#21). The newest
+    # tag, v0.8.0, predates it; move the pin to the next tag that carries it.
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@200584d8864e515a8f4801851fdf0cf6ae72e523
+    with:
+      linux-only: true
+      mutate: false
+      mutate-ignore-paths: includes
+      floor-lint: true
+      floor-lint-php: '8.2'
+      download-archive: true
+      phpcs: true
+      pest-command: composer test:unit
 
   integration:
     name: Integration (${{ matrix.mode }})
-    needs: [rector, phpstan]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -207,7 +100,7 @@ jobs:
   # The one check a ruleset requires from this workflow.
   ci:
     name: CI
-    needs: [composer-validate, floor-lint, download-archive, synced-files, no-emoji, aggregate-needs, pint, phpcs, rector, phpstan, unit, integration]
+    needs: [checks, integration]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -218,6 +111,8 @@ jobs:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
           echo "Needed job results: $RESULTS"
+          # An empty list would run no iterations and pass having read nothing.
+          if [ -z "$RESULTS" ]; then echo "::error::No needed job results to read"; exit 1; fi
           for result in $RESULTS; do
             if [ "$result" != "success" ]; then
               echo "::error::A needed job reported $result"

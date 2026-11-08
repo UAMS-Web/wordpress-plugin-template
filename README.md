@@ -68,6 +68,8 @@ It boots WordPress through `wp-phpunit` and **drops and rebuilds every table in 
 
 A plugin made from the template is **public** and runs its checks in GitHub Actions (`.github/workflows/ci.yml`).
 
+`ci.yml` calls the shared chain in `UAMS-Web/uams-ci-workflows` (the `checks` job), pinned to a commit until a tag carries the plugin inputs, with `linux-only`, mutation testing off and the plugin jobs on: floor lint, the download-archive check and phpcs, with the unit suite run as `composer test:unit`. The WordPress integration matrix stays in `ci.yml` as a plain job, because its database and WordPress download are not in the chain. The `CI` job, the one check a ruleset requires, needs both `checks` and `integration`: a job added beside the call goes in its `needs:` list. The setup action installs the integration suite's Composer dependencies by default, because the chain's PHPStan job needs them. To take a newer chain, change the pin.
+
 To make a plugin **private**: make the repository private, delete `.github/workflows/ci.yml`, and run the same checks with the shared local CI runner instead (the `local-ci` skill and its `local-ci.json` template, delivered by the sync). Private repositories pay for Actions minutes, so the local runner is the default there. Keep `release.yml`; it only runs when a release is published.
 
 ## Cut a release
