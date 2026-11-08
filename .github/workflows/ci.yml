@@ -6,6 +6,7 @@ name: CI
 on:
   push:
     branches: [scratch/607-plugin-chain]
+  pull_request:
 
 permissions:
   contents: read
@@ -33,3 +34,15 @@ jobs:
       phpcs: true
       phpcs-command: 'false'
       pest-command: composer test:unit
+
+  ci:
+    name: CI
+    needs: [plugin-on, phpcs-fails]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report the call results
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: echo "Call results: $RESULTS"
