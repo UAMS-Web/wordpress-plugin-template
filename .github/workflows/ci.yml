@@ -45,4 +45,4 @@ jobs:
       - name: Report the call results
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
-        run: echo "Call results: $RESULTS"
+        run: echo "Call results $RESULTS"
