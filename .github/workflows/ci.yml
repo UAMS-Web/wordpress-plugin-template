@@ -1,17 +1,18 @@
 name: CI
 
-# SCRATCH, not for merge: a run of the shared chain with the plugin inputs on
-# (UAMS-Web/uams-claude-skills#607). The pull request is closed after the runs are read.
+# SCRATCH, not for merge: runs of the shared chain with the plugin inputs on (UAMS-Web/uams-claude-skills#607).
+# The branch is removed by the operator after the runs are read.
 
 on:
-  pull_request:
+  push:
+    branches: [scratch/607-plugin-chain]
 
 permissions:
   contents: read
 
 jobs:
-  checks:
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@3570ed537f04c1d70ee075f49a2a3a1a59ace747
+  plugin-on:
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@200584d8864e515a8f4801851fdf0cf6ae72e523
     with:
       linux-only: true
       mutate: false
@@ -21,16 +22,14 @@ jobs:
       phpcs: true
       pest-command: composer test:unit
 
-  ci:
-    name: CI
-    needs: [checks]
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Every needed job succeeded
-        env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
-        run: |
-          echo "Needed job results: $RESULTS"
-          for result in $RESULTS; do [ "$result" = "success" ] || exit 1; done
+  phpcs-fails:
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@200584d8864e515a8f4801851fdf0cf6ae72e523
+    with:
+      linux-only: true
+      mutate: false
+      mutate-ignore-paths: includes
+      floor-lint: true
+      download-archive: true
+      phpcs: true
+      phpcs-command: 'false'
+      pest-command: composer test:unit
