@@ -93,3 +93,13 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Rejected.** A `plugin` ruleset family. Naming each job in a ruleset. A ruleset on this repository alone. Keeping the per-job guard beside the aggregate.
 
 **Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/9
+
+## 2026-11-08 The template's `ci.yml` calls the shared chain (#19)
+
+**Decision.** `ci.yml` is the shared caller: one `checks` job calls `UAMS-Web/uams-ci-workflows` with `linux-only: true`, `mutate: false`, `mutate-ignore-paths: includes`, the `floor-lint`, `download-archive` and `phpcs` jobs on, and `pest-command: composer test:unit`. `integration` stays in `ci.yml` as a plain job, and `CI` needs `checks` and `integration`. The call is pinned to commit `200584d8864e515a8f4801851fdf0cf6ae72e523`, the first to carry the plugin inputs, because the newest tag, `v0.8.0`, predates them. The setup action's `integration` input now defaults to `'true'`, because the chain's PHPStan job calls the action without it and cannot run without the integration suite's dependencies.
+
+**Why.** One CI definition serves every repository, so a plugin made from the template no longer starts on a copy that drifts. The integration matrix needs a MySQL service and a WordPress download that the chain does not carry, so it stays beside the call.
+
+**Rejected.** Moving `integration` into the chain. Keeping the template's own copy of the checks. Passing `integration: 'true'` through the chain, which has no such input.
+
+**Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/19

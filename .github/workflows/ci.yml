@@ -44,9 +44,9 @@ permissions:
 jobs:
   # The shared chain. Its checks report as `checks / <job name> (<operating system>)`.
   checks:
-    # TODO(#19): pin the tag cut after UAMS-Web/uams-claude-skills#607 is republished to
-    # UAMS-Web/uams-ci-workflows; `v0.7.0` has none of the plugin inputs below.
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@PIN-AFTER-607
+    # Pinned to the commit that published the plugin inputs (UAMS-Web/uams-ci-workflows#21). The newest
+    # tag, v0.8.0, predates it; move the pin to the next tag that carries it.
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@200584d8864e515a8f4801851fdf0cf6ae72e523
     with:
       linux-only: true
       mutate: false
