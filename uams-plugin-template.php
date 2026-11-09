@@ -51,7 +51,8 @@ if (version_compare(PHP_VERSION, '8.2', '<')) {
     return;
 }
 
-define('UAMS_PLUGIN_TEMPLATE_VERSION', '0.1.0');
+// The header's Version is the only place the release number is written.
+define('UAMS_PLUGIN_TEMPLATE_VERSION', get_file_data(__FILE__, ['Version' => 'Version'])['Version']);
 define('UAMS_PLUGIN_TEMPLATE_FILE', __FILE__);
 
 require_once __DIR__.'/includes/autoload.php';
