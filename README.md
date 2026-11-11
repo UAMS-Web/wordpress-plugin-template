@@ -40,7 +40,7 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
    Keep the version constant read from the header (`get_file_data()` in the main file) so the release number is written once; `tests/Unit/PluginHeaderTest.php` ships with the template and holds the `Plugin URI` shape, the `Author` and `Author URI` values, a three-segment `Version`, and that single source. It finds the main file by its `Plugin Name:` header, so it needs no edit after the rename.
 4. Run `composer install` and `composer setup:integration`, then `composer test`, so the first commit is green.
 5. Onboard the plugin to the shared sync, which delivers the shared skills and rules (this template is not itself a sync target). The synced copy of the archive check can replace `scripts/check-download-archive.mjs`.
-6. Set the repository's visibility and checks (below), and require the `CI` check in a ruleset.
+6. Set the repository's visibility and checks (below), and require the `CI` check in a ruleset. `node .claude/skills/repository-settings/scripts/apply-repository-settings.mjs --profile plugin UAMS-Web/<repo>` prints the plan for the settings and the ruleset; add `--apply` once the owner has said yes.
 
 ## Develop
 
