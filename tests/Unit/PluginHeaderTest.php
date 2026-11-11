@@ -54,6 +54,13 @@ it('names the repository in the Plugin URI header', function (): void {
     expect($uri)->toMatch('#^https://github\.com/UAMS-Web/[A-Za-z0-9._-]+$#');
 });
 
+it('credits UAMS Web Services as the author in the header', function (): void {
+    $source = plugin_header_test_main_file()['source'];
+
+    expect(plugin_header_test_field($source, 'Author'))->toBe('UAMS Web Services')
+        ->and(plugin_header_test_field($source, 'Author URI'))->toBe('https://communications.uams.edu/web/');
+});
+
 it('writes the Version header as a three-segment release number', function (): void {
     $version = plugin_header_test_field(plugin_header_test_main_file()['source'], 'Version');
 
