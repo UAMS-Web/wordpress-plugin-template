@@ -36,8 +36,8 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
 
    The plugin loads its classes with its own small autoloader (`includes/autoload.php`), not Composer's, because a branch deploy has no `vendor/`. That changes two things. The prefix is a string in `includes/autoload.php` as well as in `composer.json`, which maps only `autoload-dev` (the tests), so change both and keep them in step. And the autoloader maps one prefix to `includes/` and does no longest-prefix matching, so the no-directory-under-`includes/` rule is the only thing that keeps an outer plugin from claiming an inner plugin's classes.
 
-3. Update the header's `Plugin URI` and `Description`, `readme.txt`, and this README. Delete the example `Settings` screen once the plugin has its own, keeping the pattern.
-   Keep the version constant read from the header (`get_file_data()` in the main file) so the release number is written once; `tests/Unit/PluginHeaderTest.php` ships with the template and holds the `Plugin URI` shape, a three-segment `Version`, and that single source. It finds the main file by its `Plugin Name:` header, so it needs no edit after the rename.
+3. Update the header's `Plugin URI` and `Description`, `readme.txt`, and this README. Delete the example `Settings` screen once the plugin has its own, keeping the pattern. Replace the placeholder under `## Credits` with the plugin's developers; the header's `Author` and `Author URI` stay as they are.
+   Keep the version constant read from the header (`get_file_data()` in the main file) so the release number is written once; `tests/Unit/PluginHeaderTest.php` ships with the template and holds the `Plugin URI` shape, the `Author` and `Author URI` values, a three-segment `Version`, and that single source. It finds the main file by its `Plugin Name:` header, so it needs no edit after the rename.
 4. Run `composer install` and `composer setup:integration`, then `composer test`, so the first commit is green.
 5. Onboard the plugin to the shared sync, which delivers the shared skills and rules (this template is not itself a sync target). The synced copy of the archive check can replace `scripts/check-download-archive.mjs`.
 6. Set the repository's visibility and checks (below), and require the `CI` check in a ruleset.
@@ -84,6 +84,16 @@ Sites deploy a branch through WP Pusher, so nothing is built at deploy time and 
 ## The download keep-list
 
 A branch download is what WP Pusher installs, and a server may serve the plugin folder for every file type but PHP. `.gitattributes` therefore excludes everything and names back only what the plugin runs. When a runtime folder is added, add a `-export-ignore` line for it; `composer check:archive` and CI fail a change that ships anything else.
+
+## Credits
+
+Developed and maintained by UAMS Web Services.
+
+Developers:
+
+- First Last
+
+A plugin made from the template replaces the placeholder with its own developers: a person with a merged commit on the default branch, by full name, in alphabetical order by surname. Bots and AI tools are not listed. The header names UAMS Web Services as the `Author` and not individual developers, and a fork of a third-party project keeps the upstream `Author` and `Author URI` and credits UAMS Web Services' changes here instead.
 
 ## Licence
 
