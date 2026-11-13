@@ -103,3 +103,13 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Rejected.** Moving `integration` into the chain. Keeping the template's own copy of the checks. Passing `integration: 'true'` through the chain, which has no such input.
 
 **Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/19
+
+## 2026-11-12 The template's `checks` call runs all three operating systems and mutation testing (#30)
+
+**Decision.** The `checks` call drops `linux-only: true` and `mutate: false`, so the chain runs its Linux, Windows and macOS legs and its mutation job. The pin moves from commit `200584d8864e515a8f4801851fdf0cf6ae72e523` to the tag `v0.10.1`, which carries the plugin inputs. The other inputs are unchanged. This supersedes the `linux-only`, `mutate` and pin parts of the entry of 2026-11-08 (#19).
+
+**Why.** The check in `UAMS-Web/uams-ci-workflows#39` reads the template's CI run at each new release and needs every job the chain defines to have run. A tag is also a pin that a newer-chain change can move deliberately, where a bare commit cannot be told from an arbitrary one.
+
+**Rejected.** Keeping Linux only, which leaves the Windows and macOS legs unexercised by the one repository every plugin starts from. Keeping the bare commit, now that a tag carries the inputs.
+
+**Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/30
