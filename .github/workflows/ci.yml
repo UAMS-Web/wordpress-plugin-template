@@ -6,9 +6,9 @@ name: CI
 # The lint and unit chain is the shared one, `UAMS-Web/uams-ci-workflows`, called by the
 # `checks` job. One definition serves every UAMS-Web repository, so a plugin made from this
 # template does not carry a copy that drifts. The call switches on the three jobs only a
-# plugin runs (`floor-lint`, `download-archive`, `phpcs`), runs on Linux only, leaves
-# mutation testing off, and runs the plugin's unit suite as `composer test:unit`. The
-# chain's own header lists every input and its default.
+# plugin runs (`floor-lint`, `download-archive`, `phpcs`), keeps the chain's defaults of
+# Linux, Windows and macOS legs and mutation testing, and runs the plugin's unit suite as
+# `composer test:unit`. The chain's own header lists every input and its default.
 #
 # `integration` stays here as a plain job beside the call, because its MySQL service and
 # WordPress download are not in the chain (UAMS-Web/uams-claude-skills#607).
@@ -44,12 +44,10 @@ permissions:
 jobs:
   # The shared chain. Its checks report as `checks / <job name> (<operating system>)`.
   checks:
-    # Pinned to the commit that published the plugin inputs (UAMS-Web/uams-ci-workflows#21). The newest
-    # tag, v0.8.0, predates it; move the pin to the next tag that carries it.
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@200584d8864e515a8f4801851fdf0cf6ae72e523
+    # Pinned to a tag that carries the plugin inputs (UAMS-Web/uams-ci-workflows#21). To take a
+    # newer chain, move the pin to the next tag.
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.10.1
     with:
-      linux-only: true
-      mutate: false
       mutate-ignore-paths: includes
       floor-lint: true
       floor-lint-php: '8.2'
