@@ -10,12 +10,13 @@ name: CI
 # Linux, Windows and macOS legs and mutation testing, and runs the plugin's unit suite as
 # `composer test:unit`. The chain's own header lists every input and its default.
 #
-# `integration` stays here as a plain job beside the call, because its MySQL service and
+# `legs` calls the shared `runner-legs.yml`, which checks that the call's run put every job on the
+# runners its classification names. `integration` stays here as a plain job beside the call, because its MySQL service and
 # WordPress download are not in the chain (UAMS-Web/uams-claude-skills#607).
 #
 # The last job, `CI`, is the one check a ruleset requires from this workflow (with the two
 # pull-request-body checks, `Attribution footer` and `Closing keywords`). It `needs:` the
-# call and `integration`, runs `if: always()`, and fails unless every needed job reports
+# call, `legs` and `integration`, runs `if: always()`, and fails unless every needed job reports
 # `success`: a `skipped` or `cancelled` job fails it. The call ends in a `Chain result` job
 # that needs every job in the chain, so `checks` is `success` only when each of them
 # succeeded. Adding a plain job here means adding it to the `needs:` list of `CI`; the
@@ -46,7 +47,7 @@ jobs:
   checks:
     # Pinned to a tag that carries the plugin inputs (UAMS-Web/uams-ci-workflows#21). To take a
     # newer chain, move the pin to the next tag.
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.10.1
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.11.1
     with:
       mutate-ignore-paths: includes
       floor-lint: true
@@ -54,6 +55,18 @@ jobs:
       download-archive: true
       phpcs: true
       pest-command: composer test:unit
+
+  # Checks that the run of `checks` above ran every job on the runners its classification names
+  # (UAMS-Web/uams-ci-workflows#39). Its pin must name the same commit as the `checks` pin, so
+  # the two move together.
+  legs:
+    needs: [checks]
+    if: always()
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/runner-legs.yml@v0.11.1
+    permissions:
+      contents: read
+      actions: read
+      checks: read
 
   integration:
     name: Integration (${{ matrix.mode }})
@@ -98,7 +111,7 @@ jobs:
   # The one check a ruleset requires from this workflow.
   ci:
     name: CI
-    needs: [checks, integration]
+    needs: [checks, legs, integration]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
