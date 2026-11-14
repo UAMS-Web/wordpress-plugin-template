@@ -113,3 +113,13 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Rejected.** Keeping Linux only, which leaves the Windows and macOS legs unexercised by the one repository every plugin starts from. Keeping the bare commit, now that a tag carries the inputs.
 
 **Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/30
+
+## 2026-11-14 The template checks each chain release's runner legs with `legs` (#32)
+
+**Decision.** `ci.yml` gains a `legs` job that calls `UAMS-Web/uams-ci-workflows/.github/workflows/runner-legs.yml` with `needs: [checks]`, `if: always()` and read permissions on contents, actions and checks. Both pins, the `checks` call and `legs`, move to the tag `v0.11.0`, the first to carry `runner-legs.yml`, and must name the same commit. `CI` needs `checks`, `legs` and `integration`.
+
+**Why.** Since #30 the `checks` call runs every job classified for three runners on all three, so its run on the bump to each new tag is the proof that the release runs each job where its classification says. That proof needs a job that reads the run and fails on a missing leg (`UAMS-Web/uams-ci-workflows#39`). `if: always()` makes it read a run whose chain failed, because a job skipped by a failed dependency is a missing leg.
+
+**Rejected.** Pinning `legs` to a different tag than `checks`, which the check rejects because the classification it reads would not be the one that ran. Leaving `legs` out of the `needs:` of `CI`, which would let a failed leg check merge.
+
+**Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/32
