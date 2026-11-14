@@ -47,7 +47,7 @@ jobs:
   checks:
     # Pinned to a tag that carries the plugin inputs (UAMS-Web/uams-ci-workflows#21). To take a
     # newer chain, move the pin to the next tag.
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.11.0
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.11.1
     with:
       mutate-ignore-paths: includes
       floor-lint: true
@@ -62,7 +62,7 @@ jobs:
   legs:
     needs: [checks]
     if: always()
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/runner-legs.yml@v0.11.0
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/runner-legs.yml@v0.11.1
     permissions:
       contents: read
       actions: read
