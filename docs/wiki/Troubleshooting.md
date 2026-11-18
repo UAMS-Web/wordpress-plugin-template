@@ -37,7 +37,13 @@ Run `composer setup:integration` (or `composer install` in tests/Integration) fi
 
 ## Refusing to run: WP_TESTS_DB_NAME is the database the install uses
 
-`composer test:integration` stops with `Refusing to run: WP_TESTS_DB_NAME is '<name>', the database the WordPress install at <path> uses.`
+`composer test:integration` stops with:
+
+```text
+Refusing to run: WP_TESTS_DB_NAME is '<name>', the database the
+WordPress install at <path> uses. The test installer drops every table it
+finds. Point WP_TESTS_DB_NAME at a database you can afford to lose.
+```
 
 **Cause:** the test installer drops every table it finds and rebuilds the schema. The bootstrap reads `DB_NAME` from the surrounding install's `wp-config.php` and refuses when the test database is the same one.
 

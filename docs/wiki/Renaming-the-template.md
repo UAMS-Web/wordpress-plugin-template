@@ -2,19 +2,19 @@ Written against the unreleased `main` branch.
 
 Step 2 of [Create a plugin from this template (README)](https://github.com/UAMS-Web/wordpress-plugin-template#create-a-plugin-from-this-template): replace the template's names with the plugin's own. By the end of this page every placeholder name is gone and the plugin's own names are in place.
 
-**In a plugin made from this template:** delete this page, and its entries in Home, the sidebar and the footer, once the rename is done.
+**In a plugin made from this template:** delete this page once the rename is done, with every link to it: `grep -rn Renaming-the-template docs/wiki README.md` lists them.
 
 ## 1. Replace each name
 
-Search for each name case-sensitively and replace every occurrence.
+Search for each name case-sensitively and replace every occurrence. `docs/DECISIONS.md` is the exception: its entries record the template's own decisions and link the template's issues, so a new plugin keeps them as history or starts its log afresh.
 
 | Find | Replace with | Notes |
 | --- | --- | --- |
-| `uams-plugin-template` | the plugin slug | File name `uams-plugin-template.php`, the text domain, the `.pot` file name, `composer.json` package name, `scripts/build-zip.mjs`, `.gitattributes`, `phpcs.xml.dist`, `phpstan.neon.dist`, `rector.php`, `phpunit.xml`, `tests/` |
-| `UAMSWeb\PluginTemplate` and `UAMSWeb\\PluginTemplate` | the plugin's namespace (see below) | `includes/`, `includes/autoload.php`, `tests/`, `composer.json`, `phpcs.xml.dist` |
-| `uams_plugin_template` and `UAMS_PLUGIN_TEMPLATE` | the plugin's prefix | Options, hooks, constants, the test database name |
+| `uams-plugin-template` | the plugin slug | File name `uams-plugin-template.php`, the text domain, the `.pot` file name, `composer.json` package name, `scripts/build-zip.mjs`, `.gitattributes`, `phpcs.xml.dist`, `phpstan.neon.dist`, `rector.php`, `phpunit.xml`, `tests/`, `docs/wiki/` |
+| `UAMSWeb\PluginTemplate` and `UAMSWeb\\PluginTemplate` | the plugin's namespace (see below) | `includes/`, `includes/autoload.php`, `tests/`, `composer.json`, `phpcs.xml.dist`, `docs/wiki/` |
+| `uams_plugin_template` and `UAMS_PLUGIN_TEMPLATE` | the plugin's prefix | Options, hooks, constants, the test database name (also in `.github/workflows/ci.yml`), `docs/wiki/` |
 | `UAMS Plugin Template` | the plugin's name | Header, `readme.txt`, `.pot`, page titles, `docs/wiki/` |
-| `UAMS-Web/wordpress-plugin-template` | the plugin's repository | Links in `README.md` and `docs/wiki/`, the header's `Plugin URI` |
+| `UAMS-Web/wordpress-plugin-template` | the plugin's repository | The header's `Plugin URI`, the security-report link in `.github/ISSUE_TEMPLATE/config.yml`, `Report-Msgid-Bugs-To` in the `.pot` file, links in `docs/wiki/` |
 
 ## 2. Choose the namespace
 

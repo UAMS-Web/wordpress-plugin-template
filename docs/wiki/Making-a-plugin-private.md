@@ -2,7 +2,7 @@ Written against the unreleased `main` branch.
 
 A plugin made from the template is public by default, where GitHub Actions minutes are free. A plugin that must be private runs the same checks on a developer's machine instead, because private repositories pay for Actions minutes.
 
-**In a plugin made from this template:** a public plugin can delete this page and its entries in Home, the sidebar and the footer. A private plugin keeps it as the record of the switch.
+**In a plugin made from this template:** a public plugin can delete this page with every link to it: `grep -rn Making-a-plugin-private docs/wiki README.md` lists them. A private plugin keeps it as the record of the switch.
 
 ## Steps
 

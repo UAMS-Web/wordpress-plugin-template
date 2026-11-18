@@ -2,6 +2,8 @@ Written against the unreleased `main` branch.
 
 The plugin needs a new folder at run time (`assets/`, `templates/`, a committed library), and it has to reach the sites that install the plugin.
 
+**In a plugin made from this template:** the keep-list below names the main file `uams-plugin-template.php`; after the rename it names the plugin's own main file. Add each runtime folder the plugin ships to the example.
+
 ## Why the download needs a keep-list
 
 Sites install a branch download through WP Pusher, and a server may serve the plugin folder for every file type but PHP. A branch download and the release ZIP are both `git archive`, so they hold every file in the repository unless `.gitattributes` leaves it out. The template's `.gitattributes` therefore excludes everything and names back only what the plugin runs:
