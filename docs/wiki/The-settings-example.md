@@ -40,5 +40,3 @@ The template ships one example screen, **Settings > UAMS Plugin Template**, whic
 | `uams_plugin_template_version` | activation, the first time (the version, so a later release can tell which migrations to run) | `uninstall.php` |
 
 Activation and deactivation never delete data; `uninstall.php` is the one place it is removed. Deactivation clears the `uams_plugin_template_cron` scheduled hook.
-
-<!-- cspell:ignore referer unslash -->

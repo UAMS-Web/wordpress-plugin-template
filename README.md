@@ -41,6 +41,7 @@ composer test:pint                    # formatting (composer fix:pint to apply)
 composer test:phpcs                   # WordPress security sniffs
 composer test:refactor                # Rector, dry run
 composer check:archive                # the download holds only what the plugin runs
+npm ci && npm run spell               # cspell, with cspell.json and project-words.txt
 LINT_PHP=/path/to/php8.2 composer lint:floor   # parse shipped files on the floor PHP
 ```
 
@@ -76,6 +77,6 @@ Developers:
 
 A plugin made from the template replaces the placeholder with its own developers: a person with a merged commit on the default branch, by full name, in alphabetical order by surname. Bots and AI tools are not listed. The header names UAMS Web Services as the `Author` and not individual developers, and a fork of a third-party project keeps the upstream `Author` and `Author URI` and credits UAMS Web Services' changes here instead.
 
-## Licence
+## License
 
 GPL-3.0-or-later. Copyright (C) 2026 University of Arkansas for Medical Sciences.

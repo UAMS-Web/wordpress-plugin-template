@@ -29,6 +29,15 @@ updates:
       - dependency-name: wp-phpunit/wp-phpunit
         versions: ['>=7.1.0']
 
+  # cspell, the one development package, for the spell check.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm:
+        patterns: ['*']
+
   - package-ecosystem: github-actions
     directories:
       - /
