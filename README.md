@@ -2,6 +2,8 @@
 
 A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it passes the shared WordPress standard on its first commit: PHP 8.2 floor, Pest 5 unit suite, PHPUnit 9.6 integration suite against a real WordPress, Rector, PHPStan, Pint, WordPress security sniffs, and a download that holds only what the plugin runs.
 
+This README covers what is in the template, creating a plugin from it, and the development commands. The rest of the documentation (renaming, task guides, reference and troubleshooting) is in the repository's wiki, published from [`docs/wiki/`](docs/wiki/Home.md).
+
 ## What is in it
 
 | Path | Purpose |
@@ -15,27 +17,12 @@ A GitHub template for a new UAMS-Web WordPress plugin. A plugin made from it pas
 | `tests/Integration/` | PHPUnit 9.6 on `wp-phpunit`, with its own `composer.json`. |
 | `scripts/` | `build-zip.mjs` (upload ZIP), `check-download-archive.mjs` (keep-list check), `lint-floor.php` (floor lint). |
 | `docs/DECISIONS.md` | The decision log. |
+| `docs/wiki/` | The wiki's pages, published by `.github/workflows/publish-wiki.yml`. |
 
 ## Create a plugin from this template
 
 1. On GitHub, choose **Use this template**, and name the new repository for the plugin. Make it public unless it must be private (see below).
-2. Rename the template's names, everywhere they appear (a case-sensitive search for each):
-
-   | Find | Replace with | Notes |
-   | --- | --- | --- |
-   | `uams-plugin-template` | the plugin slug | File name `uams-plugin-template.php`, the text domain, the `.pot` file name, `composer.json` package name, `scripts/build-zip.mjs`, `.gitattributes`, `phpcs.xml.dist`, `phpstan.neon.dist`, `rector.php`, `phpunit.xml`, `tests/` |
-   | `UAMSWeb\PluginTemplate` and `UAMSWeb\\PluginTemplate` | the plugin's namespace (see below) | `includes/`, `includes/autoload.php`, `tests/`, `composer.json`, `phpcs.xml.dist` |
-   | `uams_plugin_template` and `UAMS_PLUGIN_TEMPLATE` | the plugin's prefix | Options, hooks, constants, the test database name |
-   | `UAMS Plugin Template` | the plugin's name | Header, `readme.txt`, `.pot`, page titles |
-
-   **The namespace.** Make it `UAMSWeb\Aether\<Product>` or `UAMSWeb\Aether\<Family>\<Product>` for a plugin in the Aether ecosystem, and `UAMSWeb\<Product>` for one outside it; the family level is optional. The prefix can be any depth, because [PSR-4](https://www.php-fig.org/psr/psr-4/) allows it, so the files under `includes/` do not move when the prefix changes. Three rules keep two packages from colliding:
-
-   - A prefix has one owner or none. Two packages never map the same one, and no package maps a bare family prefix: `UAMSWeb\Aether\Forms\Settings\` and `UAMSWeb\Aether\Forms\Multisite\` are two packages' prefixes, and nobody maps `UAMSWeb\Aether\Forms\`.
-   - A package may own a prefix with a companion nested inside it, but then the outer package has no directory under `includes/` named after the inner one. Composer picks the longest matching prefix, so an inner `UAMSWeb\People\Listings\` package is reached only if the outer `UAMSWeb\People\` package has no `includes/Listings/`.
-   - The template's own placeholder is `UAMSWeb\PluginTemplate`, the shape for a plugin outside the Aether ecosystem. A plugin in the Aether ecosystem renames it to `UAMSWeb\Aether\<Product>` instead.
-
-   The plugin loads its classes with its own small autoloader (`includes/autoload.php`), not Composer's, because a branch deploy has no `vendor/`. That changes two things. The prefix is a string in `includes/autoload.php` as well as in `composer.json`, which maps only `autoload-dev` (the tests), so change both and keep them in step. And the autoloader maps one prefix to `includes/` and does no longest-prefix matching, so the no-directory-under-`includes/` rule is the only thing that keeps an outer plugin from claiming an inner plugin's classes.
-
+2. Rename the template's names, everywhere they appear: [Renaming the template](docs/wiki/Renaming-the-template.md) lists each name to find, what replaces it and where it appears, and the rules for choosing the plugin's namespace.
 3. Update the header's `Plugin URI` and `Description`, `readme.txt`, and this README. Delete the example `Settings` screen once the plugin has its own, keeping the pattern. Replace the placeholder under `## Credits` with the plugin's developers; the header's `Author` and `Author URI` stay as they are.
    Keep the version constant read from the header (`get_file_data()` in the main file) so the release number is written once; `tests/Unit/PluginHeaderTest.php` ships with the template and holds the `Plugin URI` shape, the `Author` and `Author URI` values, a three-segment `Version`, and that single source. It finds the main file by its `Plugin Name:` header, so it needs no edit after the rename.
 4. Run `composer install` and `composer setup:integration`, then `composer test`, so the first commit is green.
@@ -67,23 +54,17 @@ It boots WordPress through `wp-phpunit` and **drops and rebuilds every table in 
 
 ## Public by default, and the switch for a private plugin
 
-A plugin made from the template is **public** and runs its checks in GitHub Actions (`.github/workflows/ci.yml`).
+A plugin made from the template is **public** and runs its checks in GitHub Actions (`.github/workflows/ci.yml`), which calls the shared chain in `UAMS-Web/uams-ci-workflows`. [Continuous integration](docs/wiki/Continuous-integration.md) lists its jobs, the pins and the one check a ruleset requires.
 
-`ci.yml` calls the shared chain in `UAMS-Web/uams-ci-workflows` (the `checks` job), pinned to the tag `v0.13.0`, which carries the plugin inputs, with the chain's defaults of Linux, Windows and macOS legs and mutation testing, and the plugin jobs on: floor lint, the download-archive check and phpcs, with the unit suite run as `composer test:unit`. The WordPress integration matrix stays in `ci.yml` as a plain job, because its database and WordPress download are not in the chain. A `legs` job beside it calls the chain's `runner-legs.yml` at the same tag and fails when a job of the call did not run on the runners its classification names; the two pins move together. The `CI` job, the one check a ruleset requires, needs `checks`, `legs` and `integration`: a job added beside the call goes in its `needs:` list. The setup action installs the integration suite's Composer dependencies by default, because the chain's PHPStan job needs them. To take a newer chain, change the pin.
-
-To make a plugin **private**: make the repository private, delete `.github/workflows/ci.yml`, and run the same checks with the shared local CI runner instead (the `local-ci` skill and its `local-ci.json` template, delivered by the sync). Private repositories pay for Actions minutes, so the local runner is the default there. Keep `release.yml`; it only runs when a release is published.
+To make a plugin **private**, follow [Making a plugin private](docs/wiki/Making-a-plugin-private.md): the checks move to the shared local CI runner, because private repositories pay for Actions minutes.
 
 ## Cut a release
 
-1. Raise `Version` in the header, `UAMS_PLUGIN_TEMPLATE_VERSION` in the main file, and `Stable tag` and the changelog in `readme.txt`.
-2. Merge to `main`, then publish a GitHub release whose tag is the version (`v1.2.3`).
-3. `release.yml` builds `uams-plugin-template-1.2.3.zip` from the tag with the download keep-list and attaches it to the release. Build one locally with `composer build` (it lands in `build/`, which is ignored).
-
-Sites deploy a branch through WP Pusher, so nothing is built at deploy time and no `dist/` directory is committed. Runtime libraries a plugin needs are committed.
+[Cutting a release](docs/wiki/Cutting-a-release.md) covers raising the version, publishing the release, and the upload ZIP that `release.yml` attaches to it. Sites deploy a branch through WP Pusher, so nothing is built at deploy time.
 
 ## The download keep-list
 
-A branch download is what WP Pusher installs, and a server may serve the plugin folder for every file type but PHP. `.gitattributes` therefore excludes everything and names back only what the plugin runs. When a runtime folder is added, add a `-export-ignore` line for it; `composer check:archive` and CI fail a change that ships anything else.
+`.gitattributes` excludes everything from a branch download and names back only what the plugin runs, and `composer check:archive` and CI fail a change that ships anything else. [Adding a runtime folder](docs/wiki/Adding-a-runtime-folder.md) explains why and how to add a folder to it.
 
 ## Credits
 
