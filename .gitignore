@@ -8,3 +8,4 @@
 /tests/Integration/.phpunit.result.cache
 /.rector-cache/
 /.pint.cache
+/.claude/worktrees/
