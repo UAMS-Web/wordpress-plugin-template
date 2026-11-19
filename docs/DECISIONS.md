@@ -88,7 +88,7 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 
 `Aggregate needs` fails a pull request that leaves a job out of the `CI` needs list, so a job added or renamed later needs no ruleset edit. The per-job required-checks guard (`check-required-checks.mjs --strict`) is not delivered to the template and is retired for every repository that takes `ci-aggregate`.
 
-**Why.** Naming each job in a ruleset makes a renamed job block every merge until the ruleset is edited, and a skipped job counts as passing. One aggregate context moves that check into `ci.yml`, where the change that adds a job also updates the list. The guard compared reported job names with the ruleset, which is the wrong comparison once only three names are required: it reports every job as unrequired. A required context that nothing reports blocks the next pull request loudly, and `Aggregate needs` covers a job left out of `CI`, so the guard checks nothing the aggregate does not.
+**Why.** Naming each job in a ruleset makes a renamed job block every merge until the ruleset is edited, and a skipped job counts as passing. One aggregate context moves that check into `ci.yml`, where the change that adds a job also updates the list. The guard compared reported job names with the ruleset, which is the wrong comparison once only three names are required: it reports every job as not required. A required context that nothing reports blocks the next pull request loudly, and `Aggregate needs` covers a job left out of `CI`, so the guard checks nothing the aggregate does not.
 
 **Rejected.** A `plugin` ruleset family. Naming each job in a ruleset. A ruleset on this repository alone. Keeping the per-job guard beside the aggregate.
 
@@ -123,3 +123,13 @@ Entries run oldest first, so a new entry is appended to the end of the file. Eve
 **Rejected.** Pinning `legs` to a different tag than `checks`, which the check rejects because the classification it reads would not be the one that ran. Leaving `legs` out of the `needs:` of `CI`, which would let a failed leg check merge.
 
 **Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/32
+
+## 2026-11-18 The spell check runs from a root `package.json` (#42)
+
+**Decision.** The template checks its spelling with cspell through the shared `spell-check` skill's setup: `cspell.json` and `project-words.txt` at the root, `scripts/spell.mjs`, a root `package.json` whose only development dependency is `cspell` (pinned to `10.4.0`), a committed `package-lock.json`, and a `spell` job in `ci.yml` that runs `npm ci` and `npm run spell` and is in the `needs:` of `CI`. Dependabot watches the npm ecosystem. The project owner chose this route on 2026-11-18.
+
+**Why.** The `american-english-prose` rule and the pull-request workflow assume a spell check, and the template had none. The skill's route makes the local run and the Actions job the same command. The download keep-list already leaves `package.json`, the lock file and `scripts/` out of the plugin download.
+
+**Rejected.** Running a pinned `npx cspell` with no `package.json`, which adds nothing to the dependencies but departs from the shared skill and leaves Dependabot nothing to update. Leaving the template without a spell check.
+
+**Companion.** https://github.com/UAMS-Web/wordpress-plugin-template/issues/42

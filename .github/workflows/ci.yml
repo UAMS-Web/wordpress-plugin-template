@@ -10,13 +10,15 @@ name: CI
 # Linux, Windows and macOS legs and mutation testing, and runs the plugin's unit suite as
 # `composer test:unit`. The chain's own header lists every input and its default.
 #
+# `spell` runs cspell with the repository's `cspell.json` and `project-words.txt` (`npm run spell`).
+#
 # `legs` calls the shared `runner-legs.yml`, which checks that the call's run put every job on the
 # runners its classification names. `integration` stays here as a plain job beside the call, because its MySQL service and
 # WordPress download are not in the chain (UAMS-Web/uams-claude-skills#607).
 #
 # The last job, `CI`, is the one check a ruleset requires from this workflow (with the two
 # pull-request-body checks, `Attribution footer` and `Closing keywords`). It `needs:` the
-# call, `legs` and `integration`, runs `if: always()`, and fails unless every needed job reports
+# call, `legs`, `integration` and `spell`, runs `if: always()`, and fails unless every needed job reports
 # `success`: a `skipped` or `cancelled` job fails it. The call ends in a `Chain result` job
 # that needs every job in the chain, so `checks` is `success` only when each of them
 # succeeded. Adding a plain job here means adding it to the `needs:` list of `CI`; the
@@ -108,10 +110,25 @@ jobs:
           curl -fsSL "https://wordpress.org/wordpress-${WP_VERSION}.tar.gz" | tar -xz -C "$WP_TESTS_ABSPATH" --strip-components=1
       - run: composer test:integration
 
+  # cspell over the repository, as `npm run spell` runs it locally (the shared `spell-check` skill's
+  # job). It needs no PHP, so it stands beside the chain rather than in it.
+  spell:
+    name: Spell check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run spell
+
   # The one check a ruleset requires from this workflow.
   ci:
     name: CI
-    needs: [checks, legs, integration]
+    needs: [checks, legs, integration, spell]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5

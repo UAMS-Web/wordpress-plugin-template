@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "description": "Development tooling only. Sites install a branch download, which the keep-list in .gitattributes leaves this file out of.",
+    "scripts": {
+        "spell": "node scripts/spell.mjs"
+    },
+    "devDependencies": {
+        "cspell": "10.4.0"
+    }
+}
