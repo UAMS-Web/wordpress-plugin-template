@@ -8,7 +8,7 @@ A plugin made from the template is public and runs its checks in GitHub Actions,
 
 | Job | What it runs | Notes |
 | --- | --- | --- |
-| `checks` | The shared chain in `UAMS-Web/uams-ci-workflows`, pinned to the tag `v0.13.0` | Linux, Windows and macOS legs and mutation testing (the chain's defaults), plus the plugin jobs: floor lint on PHP 8.2, the download-archive check and phpcs. The unit suite runs as `composer test:unit`. Its checks report as `checks / <job name> (<operating system>)`. |
+| `checks` | The shared chain in `UAMS-Web/uams-ci-workflows`, pinned to the tag `v0.17.0` | Linux, Windows and macOS legs (from `linux-only: false`; without it the chain runs every job on `ubuntu-latest` only) and mutation testing (the chain's default), plus the plugin jobs: floor lint on PHP 8.2, the download-archive check and phpcs. The unit suite runs as `composer test:unit`. Its checks report as `checks / <job name> (<operating system>)`. |
 | `legs` | The chain's `runner-legs.yml`, at the same tag | Fails when a job of the `checks` call did not run on the runners its classification names. |
 | `integration` | `composer test:integration`, single site and multisite | A plain job beside the call, because its MySQL service and WordPress download are not in the chain. It downloads WordPress 7.0.8, the version most sites run. |
 | `spell` | `npm ci`, then `npm run spell` | cspell over the repository with `cspell.json` and `project-words.txt`, as the shared `spell-check` skill sets it up. It refuses a run that checked fewer than 30 files. A flagged word is reworded first; a dictionary entry needs a stated reason. |
