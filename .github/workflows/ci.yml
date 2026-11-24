@@ -6,9 +6,9 @@ name: CI
 # The lint and unit chain is the shared one, `UAMS-Web/uams-ci-workflows`, called by the
 # `checks` job. One definition serves every UAMS-Web repository, so a plugin made from this
 # template does not carry a copy that drifts. The call switches on the three jobs only a
-# plugin runs (`floor-lint`, `download-archive`, `phpcs`), keeps the chain's defaults of
-# Linux, Windows and macOS legs and mutation testing, and runs the plugin's unit suite as
-# `composer test:unit`. The chain's own header lists every input and its default.
+# plugin runs (`floor-lint`, `download-archive`, `phpcs`), asks for the Windows and macOS legs
+# with `linux-only: false`, keeps the chain's default of mutation testing, and runs the plugin's
+# unit suite as `composer test:unit`. The chain's own header lists every input and its default.
 #
 # `spell` runs cspell with the repository's `cspell.json` and `project-words.txt` (`npm run spell`).
 #
@@ -49,8 +49,12 @@ jobs:
   checks:
     # Pinned to a tag that carries the plugin inputs (UAMS-Web/uams-ci-workflows#21). To take a
     # newer chain, move the pin to the next tag.
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.13.0
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/ci.yml@v0.17.0
     with:
+      # The chain runs every job on `ubuntu-latest` only unless a caller names more runners.
+      # This repository proves each chain release on three runners, so it asks for each job's
+      # own classification (UAMS-Web/uams-ci-workflows#70).
+      linux-only: false
       mutate-ignore-paths: includes
       floor-lint: true
       floor-lint-php: '8.2'
@@ -64,7 +68,7 @@ jobs:
   legs:
     needs: [checks]
     if: always()
-    uses: UAMS-Web/uams-ci-workflows/.github/workflows/runner-legs.yml@v0.13.0
+    uses: UAMS-Web/uams-ci-workflows/.github/workflows/runner-legs.yml@v0.17.0
     permissions:
       contents: read
       actions: read
