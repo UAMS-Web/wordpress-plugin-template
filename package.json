@@ -5,6 +5,6 @@
         "spell": "node scripts/spell.mjs"
     },
     "devDependencies": {
-        "cspell": "10.5.1"
+        "cspell": "10.5.2"
     }
 }
